@@ -44,7 +44,7 @@ app.use('/api/community', require('./routes/community'));
 app.use('/api/insights', require('./routes/insights'));
 
 // Fallback route for React Router (SPA)
-app.get('*', (req, res) => {
+app.get('/{*path}', (req, res) => {
     res.sendFile(path.join(clientPath, 'index.html'));
 });
 
