@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path');
 require('dotenv').config();
 require('./config/passport');
 const passport = require('passport');
@@ -12,6 +13,7 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
     "http://localhost:5173",
+    "http://localhost:5000",
     process.env.CLIENT_URL
 ].filter(Boolean);
 
@@ -29,8 +31,21 @@ app.use(cors({
 app.use(express.json());
 app.use(passport.initialize());
 
-app.get('/', (req, res) => {
-    res.send('Server is running');
+// Serve React static files
+const clientPath = path.join(__dirname, '..', 'client', 'dist');
+app.use(express.static(clientPath));
+
+// API routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/rooms', require('./routes/rooms'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/explore', require('./routes/explore'));
+app.use('/api/community', require('./routes/community'));
+app.use('/api/insights', require('./routes/insights'));
+
+// Fallback route for React Router (SPA)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(clientPath, 'index.html'));
 });
 
 // TEMPORARY: Trigger seeding via HTTP
@@ -141,13 +156,6 @@ app.get('/api/seed', async (req, res) => {
         res.status(500).send('Seeding failed: ' + err.message);
     }
 });
-
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/rooms', require('./routes/rooms'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/explore', require('./routes/explore'));
-app.use('/api/community', require('./routes/community'));
-app.use('/api/insights', require('./routes/insights'));
 
 const PORT = process.env.PORT || 5000;
 
