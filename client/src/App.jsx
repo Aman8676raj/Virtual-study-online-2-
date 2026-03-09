@@ -39,7 +39,7 @@ function App() {
         .then(res => {
           console.log('User fetch success:', res.data);
           localStorage.setItem('user', JSON.stringify(res.data.result));
-          // Remove token from URL
+          // Remove token fF=rom =
           console.log('Cleaning URL...');
           window.history.replaceState({}, document.title, "/");
           // Force reload to update Navbar state

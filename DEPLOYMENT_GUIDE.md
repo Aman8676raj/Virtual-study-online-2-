@@ -52,7 +52,7 @@ mongodb+srv://cohortuser:YOUR_PASSWORD@cluster.mongodb.net/cohort?retryWrites=tr
 3. Configure:
    - **Name:** `virtual-online-study-api` (or your choice)
    - **Environment:** `Node`
-   - **Build Command:** `npm install`
+   - **Build Command:** `cd server && npm install && cd .. && cd client && npm install && npm run build && cd ..`
    - **Start Command:** `node server/index.js`
    - **Plan:** Free tier
 
@@ -61,7 +61,7 @@ In Render dashboard, go to **Environment**:
 
 Add these variables:
 ```
-MONGO_URI=mongodb+srv://cohortuser:YOUR_PASSWORD@cluster.mongodb.net/cohort?retryWrites=true&w=majority
+MONGO_URI=mongodb+srv://<db_username>:<db_password>@virtual.yq2sjc1.mongodb.net/test?retryWrites=true&w=majority&appName=Virtual
 GOOGLE_CLIENT_ID=your_google_client_id_here
 GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 CLIENT_URL=https://your-render-app.onrender.com
@@ -123,7 +123,7 @@ PORT=5000
 
 ### Render.com (Production)
 ```
-MONGO_URI=mongodb+srv://cohortuser:PASSWORD@cluster.mongodb.net/cohort?retryWrites=true&w=majority
+MONGO_URI=mongodb+srv://<db_username>:<db_password>@virtual.yq2sjc1.mongodb.net/test?retryWrites=true&w=majority&appName=Virtual
 GOOGLE_CLIENT_ID=your_google_client_id_here
 GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 CLIENT_URL=https://your-render-app.onrender.com
