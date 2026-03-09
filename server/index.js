@@ -19,14 +19,14 @@ const allowedOrigins = [
 
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigins,
+        origin: process.env.NODE_ENV === 'production' ? '*' : allowedOrigins,
         methods: ["GET", "POST"]
     }
 });
 
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true
+    origin: process.env.NODE_ENV === 'production' ? '*' : allowedOrigins,
+    credentials: process.env.NODE_ENV !== 'production'
 }));
 app.use(express.json());
 app.use(passport.initialize());
