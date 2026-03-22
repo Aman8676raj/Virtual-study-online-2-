@@ -25,10 +25,7 @@ const io = new Server(server, {
     }
 });
 
-app.use(cors({
-    origin: allowedOrigins,
-    credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
 
@@ -40,14 +37,16 @@ app.use('/api/explore', require('./routes/explore'));
 app.use('/api/community', require('./routes/community'));
 app.use('/api/insights', require('./routes/insights'));
 
-// Serve React static files (AFTER API routes)
+// Serve React static files only if client build exists (for full-stack deployment)
 const clientPath = path.join(__dirname, '..', 'client', 'dist');
-app.use(express.static(clientPath));
-
-// SPA catch-all fallback (MUST be LAST)
-app.get('*', (req, res) => {
-    res.sendFile(path.join(clientPath, 'index.html'));
-});
+const fs = require('fs');
+if (fs.existsSync(clientPath)) {
+    app.use(express.static(clientPath));
+    // SPA catch-all fallback (MUST be LAST)
+    app.use((req, res) => {
+        res.sendFile(path.join(clientPath, 'index.html'));
+    });
+}
 
 // Global error handler
 app.use((err, req, res, next) => {
