@@ -6,7 +6,7 @@ import API_URL from '../config';
 
 // Placeholder/Simple Chart Component
 const PlaceholderChart = ({ data = [], height = "h-32" }) => (
-    <div className={`w - full ${height} flex items - end justify - between gap - 2`}>
+    <div className={`w-full ${height} flex items-end justify-between gap-2`}>
         {data.map((h, i) => {
             // normalize height: max is ~100 or Find Max. Assuming max 120 mins for viz
             const pct = Math.min(100, (h / 120) * 100);
@@ -37,7 +37,7 @@ const Insights = () => {
 
     useEffect(() => {
         if (user) fetchData();
-    }, [user]);
+    }, []);
 
     const fetchData = async () => {
         try {
@@ -80,7 +80,7 @@ const Insights = () => {
                     >
                         <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl -mr-8 -mt-8"></div>
                         <div className="flex justify-between items-start mb-4">
-                            <div className={`p - 3 rounded - xl ${stat.color} `}>
+                            <div className={`p-3 rounded-xl ${stat.color}`}>
                                 {stat.icon}
                             </div>
                             {idx === 3 && <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">ACTIVE</span>}
@@ -117,11 +117,11 @@ const Insights = () => {
                         <ul className="space-y-4">
                             {data.goals.map((goal, i) => (
                                 <li key={i} className="flex items-start gap-3">
-                                    <div className={`mt - 1 w - 5 h - 5 rounded border flex items - center justify - center ${goal.completed ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-gray-300'} `}>
+                                    <div className={`mt-1 w-5 h-5 rounded border flex items-center justify-center ${goal.completed ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-gray-300'}`}>
                                         {goal.completed && <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                                     </div>
                                     <div>
-                                        <p className={`text - sm font - medium ${goal.completed ? 'text-gray-400 line-through' : 'text-gray-700 dark:text-white'} `}>{goal.title}</p>
+                                        <p className={`text-sm font-medium ${goal.completed ? 'text-gray-400 line-through' : 'text-gray-700 dark:text-white'}`}>{goal.title}</p>
                                         <p className="text-xs text-gray-400">{new Date(goal.deadline).toLocaleDateString()}</p>
                                     </div>
                                 </li>

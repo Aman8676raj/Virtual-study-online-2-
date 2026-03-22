@@ -32,7 +32,7 @@ const Home = () => {
         if (user) {
             fetchDashboardData();
         }
-    }, [user]);
+    }, []);
 
 
 

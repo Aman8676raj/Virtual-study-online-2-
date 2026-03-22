@@ -58,7 +58,6 @@ router.post('/:userId/stats', async (req, res) => {
         user.studyStats.streak += 1;
 
         await user.save();
-        await user.save();
         res.json(user.studyStats);
     } catch (err) {
         console.error(err);

@@ -139,9 +139,13 @@ const Profile = () => {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {message && (
-                            <div className={`p-4 rounded-xl text-sm font-medium flex items-center gap-2 ${message.type === 'success' ? 'bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400' : 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
-                                {message.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
-                                {message.text}
+                            <div className="p-4 rounded-xl text-sm font-medium flex items-center gap-2 bg-green-50 text-green-600 dark:bg-green-500/10 dark:text-green-400">
+                                {message}
+                            </div>
+                        )}
+                        {error && (
+                            <div className="p-4 rounded-xl text-sm font-medium flex items-center gap-2 bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400">
+                                {error}
                             </div>
                         )}
 
