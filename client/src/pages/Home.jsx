@@ -29,7 +29,7 @@ const Home = () => {
     });
 
     useEffect(() => {
-        if (user) {
+        if (user && (user._id || user.id)) {
             fetchDashboardData();
         }
     }, []);
@@ -54,7 +54,7 @@ const Home = () => {
         try {
             const res = await axios.post(`${API_URL}/api/rooms/create`, {
                 name: roomName,
-                userId: user._id,
+                userId: user._id || user.id,
                 password: isPrivate ? roomPassword : null,
                 settings: isTimerEnabled ? { timerDuration: parseInt(timerDuration) } : null
             });
@@ -82,7 +82,7 @@ const Home = () => {
         try {
             const res = await axios.post(`${API_URL}/api/rooms/join`, {
                 roomId: id,
-                userId: user._id,
+                userId: user._id || user.id,
                 password: password
             });
             navigate(`/room/${res.data.roomId}`);
@@ -365,7 +365,9 @@ const Home = () => {
 
     const fetchDashboardData = async () => {
         try {
-            const res = await axios.get(`${API_URL}/api/users/${user._id}/dashboard`);
+            const userId = user?._id || user?.id;
+            if (!userId) return;
+            const res = await axios.get(`${API_URL}/api/users/${userId}/dashboard`);
             setDashboardData(res.data);
             // Also update rooms list for "Upcoming Sessions" if we want to show all global rooms there
             // Or maybe "Upcoming" should be "Joined Rooms"
@@ -381,7 +383,7 @@ const Home = () => {
                 {/* Header */}
                 <div className="mb-10 flex justify-between items-end">
                     <div>
-                        <h1 className="text-4xl font-bold text-gray-800 dark:text-white font-display">{getGreeting()}, {user.username} 👋</h1>
+                        <h1 className="text-4xl font-bold text-gray-800 dark:text-white font-display">{getGreeting()}, {user.username || user.name || 'User'} 👋</h1>
                         <p className="text-gray-500 dark:text-gray-400 mt-2 text-lg">Ready to be productive today?</p>
                     </div>
                     <div className="text-right hidden md:block">
@@ -561,9 +563,9 @@ const Home = () => {
                                     dashboardData.joinedRooms.map((group, idx) => (
                                         <div key={idx} onClick={() => navigate(`/room/${group.roomId}`)} className="p-3 rounded-xl hover:bg-white/50 dark:hover:bg-white/5 transition cursor-pointer flex items-center gap-4 group">
                                             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900 dark:to-violet-900 text-indigo-600 dark:text-indigo-300 flex items-center justify-center text-sm font-bold group-hover:scale-110 transition-transform">
-                                                {group.name.charAt(0)}
+                                                {(group.name || '?').charAt(0)}
                                             </div>
-                                            <span className="text-sm font-bold text-gray-700 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">{group.name}</span>
+                                            <span className="text-sm font-bold text-gray-700 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">{group.name || 'Untitled Room'}</span>
                                         </div>
                                     ))
                                 ) : (

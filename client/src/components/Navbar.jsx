@@ -96,12 +96,12 @@ const Navbar = () => {
                                     <Link to="/profile" className="flex items-center gap-3 group">
                                         <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-100 to-violet-100 dark:from-indigo-900 dark:to-violet-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-sm border border-indigo-200 dark:border-indigo-700 overflow-hidden group-hover:border-indigo-400 transition-colors">
                                             {user.avatar ? (
-                                                <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+                                                <img src={user.avatar} alt={user.username || user.name} className="w-full h-full object-cover" />
                                             ) : (
-                                                user.username.charAt(0).toUpperCase()
+                                                (user.username || user.name || '?').charAt(0).toUpperCase()
                                             )}
                                         </div>
-                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200 font-display group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{user.username}</span>
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200 font-display group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{user.username || user.name}</span>
                                     </Link>
                                 </div>
                                 <button
@@ -138,9 +138,9 @@ const Navbar = () => {
                         {user && (
                             <Link to="/profile" className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-sm border border-indigo-200 dark:border-indigo-700">
                                 {user.avatar ? (
-                                    <img src={user.avatar} alt={user.username} className="w-full h-full object-cover rounded-full" />
+                                    <img src={user.avatar} alt={user.username || user.name || 'User'} className="w-full h-full object-cover rounded-full" />
                                 ) : (
-                                    user.username.charAt(0).toUpperCase()
+                                    (user.username || user.name || '?').charAt(0).toUpperCase()
                                 )}
                             </Link>
                         )}

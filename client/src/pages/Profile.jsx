@@ -56,7 +56,8 @@ const Profile = () => {
                 updatePayload.password = formData.password;
             }
 
-            const res = await axios.put(`${API_URL}/api/users/${user._id}`, updatePayload);
+            const userId = user._id || user.id;
+            const res = await axios.put(`${API_URL}/api/users/${userId}`, updatePayload);
 
             // Update local storage and state
             const updatedUser = { ...user, ...res.data };
@@ -90,7 +91,7 @@ const Profile = () => {
                                 <img src={formData.avatar} alt="Profile" className="w-full h-full object-cover bg-white dark:bg-gray-800" />
                             ) : (
                                 <div className="w-full h-full bg-white dark:bg-gray-800 flex items-center justify-center text-4xl font-bold text-indigo-500">
-                                    {formData.username.charAt(0).toUpperCase()}
+                                    {(formData.username || user.username || user.name || '?').charAt(0).toUpperCase()}
                                 </div>
                             )}
                         </div>

@@ -41,7 +41,9 @@ const Insights = () => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`${API_URL}/api/insights/${user._id}`);
+            const userId = user?._id || user?.id;
+            if (!userId) return;
+            const res = await axios.get(`${API_URL}/api/insights/${userId}`);
             setData(res.data);
         } catch (err) {
             console.error(err);

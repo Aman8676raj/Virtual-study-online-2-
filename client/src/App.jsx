@@ -8,12 +8,15 @@ import AnimatedRoutes from './components/AnimatedRoutes';
 
 import { DarkModeProvider } from './context/DarkModeContext';
 
+import { Toaster } from 'react-hot-toast';
+
 function AppContent() {
   const location = useLocation();
   const isRoomPage = location.pathname.startsWith('/room/');
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       {!isRoomPage && <Navbar />}
       <AnimatedRoutes />
     </div>

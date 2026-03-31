@@ -26,6 +26,10 @@ const roomSchema = new mongoose.Schema({
     settings: {
         timerDuration: { type: Number, default: 0 }, // in minutes
         timerStartTime: { type: Date }
+    },
+    whiteboardState: {
+        type: String, // Stringified JSON
+        default: ''
     }
 }, { timestamps: true });
 

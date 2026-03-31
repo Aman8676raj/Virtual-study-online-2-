@@ -12,7 +12,13 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        const newSocket = io(API_URL);
+        const token = localStorage.getItem('token') || '';
+        const guestName = localStorage.getItem('guestName') || '';
+        const newSocket = io(API_URL || undefined, {
+            auth: { token, guestName },
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000
+        });
         setSocket(newSocket);
 
         return () => newSocket.close();

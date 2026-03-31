@@ -13,7 +13,7 @@ const Comment = ({ comment, postId, refreshComments, depth = 0 }) => {
         try {
             await axios.post(`${API_URL}/api/community/${postId}/comments`, {
                 content: replyContent,
-                userId: user._id,
+                userId: user?._id || user?.id,
                 parentId: comment._id
             });
             setReplyContent('');
@@ -130,7 +130,7 @@ const CommentSection = ({ postId, isOpen }) => {
         try {
             await axios.post(`${API_URL}/api/community/${postId}/comments`, {
                 content: newComment,
-                userId: user._id
+                userId: user?._id || user?.id
             });
             setNewComment('');
             fetchComments();
@@ -149,7 +149,7 @@ const CommentSection = ({ postId, isOpen }) => {
 
             <div className="flex gap-4 mb-8">
                 <div className="w-8 h-8 rounded-full bg-gray-200 shrink-0 overflow-hidden">
-                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username}`} alt="avatar" />
+                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username || user?.name || 'Guest'}`} alt="avatar" />
                 </div>
                 <div className="flex-1">
                     <input

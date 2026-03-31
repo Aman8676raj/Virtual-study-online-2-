@@ -31,7 +31,7 @@ const Community = () => {
         try {
             await axios.post(`${API_URL}/api/community`, {
                 content: newPostContent,
-                userId: user?._id, // Use real user ID
+                userId: user?._id || user?.id, // Use real user ID
                 tags: ["#general"], // Simplified for now
                 image: imageUrl
             });
@@ -47,18 +47,19 @@ const Community = () => {
     const handleLike = async (postId) => {
         try {
             // Optimistic update
+            const userId = user?._id || user?.id;
             setPosts(posts.map(p => {
                 if (p._id === postId) {
-                    const isLiked = p.likes.includes(user._id);
+                    const isLiked = p.likes.includes(userId);
                     return {
                         ...p,
-                        likes: isLiked ? p.likes.filter(id => id !== user._id) : [...p.likes, user._id]
+                        likes: isLiked ? p.likes.filter(id => id !== userId) : [...p.likes, userId]
                     };
                 }
                 return p;
             }));
 
-            await axios.put(`${API_URL}/api/community/${postId}/like`, { userId: user._id });
+            await axios.put(`${API_URL}/api/community/${postId}/like`, { userId: user?._id || user?.id });
         } catch (err) {
             console.error(err);
             fetchPosts(); // Revert on error
@@ -169,9 +170,9 @@ const Community = () => {
                                 <div className="flex items-center gap-6 border-t border-gray-50 pt-4">
                                     <button
                                         onClick={() => handleLike(post._id)}
-                                        className={`flex items-center gap-2 text-sm font-bold transition-colors ${post.likes?.includes(user?._id) ? 'text-pink-500' : 'text-gray-500 hover:text-pink-500'}`}
+                                        className={`flex items-center gap-2 text-sm font-bold transition-colors ${post.likes?.includes(user?._id || user?.id) ? 'text-pink-500' : 'text-gray-500 hover:text-pink-500'}`}
                                     >
-                                        <Heart size={20} fill={post.likes?.includes(user?._id) ? "currentColor" : "none"} />
+                                        <Heart size={20} fill={post.likes?.includes(user?._id || user?.id) ? "currentColor" : "none"} />
                                         {post.likes?.length || 0}
                                     </button>
                                     <button

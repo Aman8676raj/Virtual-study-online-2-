@@ -8,6 +8,10 @@ const useMediaDevices = () => {
 
     useEffect(() => {
         const getDevices = async () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.warn("Media devices not supported or blocked. Please ensure you are running on localhost or HTTPS.");
+                return;
+            }
             try {
                 // Request permission first to ensure labels are available
                 await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
@@ -23,9 +27,13 @@ const useMediaDevices = () => {
         };
 
         getDevices();
-        navigator.mediaDevices.addEventListener('devicechange', getDevices);
+        if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+            navigator.mediaDevices.addEventListener('devicechange', getDevices);
+        }
         return () => {
-            navigator.mediaDevices.removeEventListener('devicechange', getDevices);
+            if (navigator.mediaDevices && navigator.mediaDevices.removeEventListener) {
+                navigator.mediaDevices.removeEventListener('devicechange', getDevices);
+            }
         };
     }, []);
 
