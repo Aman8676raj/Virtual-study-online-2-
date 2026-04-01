@@ -409,8 +409,17 @@ const Room = () => {
     // --- WebRTC Helpers ---
     function removePeer(id) {
         const peerObj = peersRef.current.find(p => p.peerID === id);
-        if (peerObj && peerObj.peer) {
-            try { peerObj.peer.destroy(); } catch (e) { console.error(e); }
+        if (peerObj) {
+            if (peerObj.stream) {
+                try {
+                    peerObj.stream.getTracks().forEach(t => t.stop());
+                } catch (e) {
+                    console.error("Error stopping tracks for", id, e);
+                }
+            }
+            if (peerObj.peer) {
+                try { peerObj.peer.destroy(); } catch (e) { console.error("Error destroying peer", id, e); }
+            }
         }
         peersRef.current = peersRef.current.filter(p => p.peerID !== id);
         setPeers(users => users.filter(p => p.peerID !== id));
@@ -432,7 +441,13 @@ const Room = () => {
             socket.emit("call-user", { userToCall, signalData: signal, from: callerID, name: currentUserName });
         });
         peer.on("stream", remoteStream => {
-            console.log("STREAM RECEIVED (createPeer)");
+            console.log(`STREAM RECEIVED (createPeer) from ${userToCall}`, remoteStream.id);
+            // Deduplicate stream
+            const existingPeer = peersRef.current.find(u => u.peerID === userToCall);
+            if (existingPeer && existingPeer.stream && existingPeer.stream.id === remoteStream.id) {
+                console.warn(`Duplicate stream detected for ${userToCall}. Ignoring.`);
+                return;
+            }
             // Update stream in state
             setPeers(users => users.map(u => u.peerID === userToCall ? { ...u, stream: remoteStream } : u));
             // Update ref
@@ -469,7 +484,13 @@ const Room = () => {
         });
         peer.signal(incomingSignal);
         peer.on("stream", remoteStream => {
-            console.log("STREAM RECEIVED (addPeer)");
+            console.log(`STREAM RECEIVED (addPeer) from ${callerID}`, remoteStream.id);
+            // Deduplicate stream
+            const existingPeer = peersRef.current.find(u => u.peerID === callerID);
+            if (existingPeer && existingPeer.stream && existingPeer.stream.id === remoteStream.id) {
+                console.warn(`Duplicate stream detected for ${callerID}. Ignoring.`);
+                return;
+            }
             // Update stream in state
             setPeers(users => users.map(u => u.peerID === callerID ? { ...u, stream: remoteStream } : u));
             // Update ref
@@ -761,7 +782,7 @@ const Room = () => {
                                     {filmstripUsers.map((u, i) => (
                                         <div key={u.type === 'local' ? 'me' : u.data.peerID} className="min-w-[160px] md:min-w-[220px] h-full shadow-md rounded-xl overflow-hidden relative border border-slate-200 dark:border-white/10 shrink-0 bg-black">
                                             {u.type === 'local' ? (
-                                                <Video stream={localDisplayStream} isMuted={true} isCameraOff={!isVideoOn && !isScreenSharing} name="You" peerID="local" isActiveSpeaker={activeSpeakerId === 'local'} onSpeakingStateChange={handleSpeakingStateChange} className={`w-full h-full object-cover ${isScreenSharing ? '' : 'transform scale-x-[-1]'}`} />
+                                                <Video stream={localDisplayStream} isMuted={true} isCameraOff={!isVideoOn && !isScreenSharing} name="You" peerID="local" isLocal={true} isActiveSpeaker={activeSpeakerId === 'local'} onSpeakingStateChange={handleSpeakingStateChange} className={`w-full h-full object-cover ${isScreenSharing ? '' : 'transform scale-x-[-1]'}`} />
                                             ) : (
                                                 <Video stream={u.data.stream} isMuted={u.data.isMuted} isCameraOff={u.data.isCameraOff} name={u.data.name} peerID={u.data.peerID} isActiveSpeaker={activeSpeakerId === u.data.peerID} onSpeakingStateChange={handleSpeakingStateChange} className="w-full h-full object-cover" />
                                             )}
@@ -789,7 +810,7 @@ const Room = () => {
                                                     {globalWhiteboard.ownerId === socket?.id && ' (You)'}
                                                 </div>
                                                 {globalWhiteboard.ownerId === socket?.id ? (
-                                                    <Video stream={localDisplayStream} isMuted={true} isCameraOff={!isVideoOn && !isScreenSharing} className="w-full h-full object-cover transform scale-x-[-1]" />
+                                                    <Video stream={localDisplayStream} isMuted={true} isCameraOff={!isVideoOn && !isScreenSharing} isLocal={true} className="w-full h-full object-cover transform scale-x-[-1]" />
                                                 ) : (
                                                     <Video stream={peers.find(p=>p.peerID===globalWhiteboard.ownerId)?.stream} isMuted={peers.find(p=>p.peerID===globalWhiteboard.ownerId)?.isMuted} isCameraOff={peers.find(p=>p.peerID===globalWhiteboard.ownerId)?.isCameraOff} className="w-full h-full object-cover" />
                                                 )}
@@ -822,7 +843,7 @@ const Room = () => {
                                 ) : (
                                     <>
                                         {spotlightUser?.type === 'local' ? (
-                                            <Video stream={localDisplayStream} isMuted={true} isCameraOff={!isVideoOn && !isScreenSharing} peerID="local" isActiveSpeaker={activeSpeakerId === 'local'} onSpeakingStateChange={handleSpeakingStateChange} className={`w-full h-full object-contain ${isScreenSharing ? '' : 'transform scale-x-[-1]'}`} />
+                                            <Video stream={localDisplayStream} isMuted={true} isCameraOff={!isVideoOn && !isScreenSharing} peerID="local" isLocal={true} isActiveSpeaker={activeSpeakerId === 'local'} onSpeakingStateChange={handleSpeakingStateChange} className={`w-full h-full object-contain ${isScreenSharing ? '' : 'transform scale-x-[-1]'}`} />
                                         ) : (
                                             <Video key={spotlightUser?.data.isScreenSharing ? 'screen' : 'cam'} stream={spotlightUser?.data.stream} isMuted={spotlightUser?.data.isMuted} isCameraOff={spotlightUser?.data.isCameraOff} peerID={spotlightUser?.data.peerID} isActiveSpeaker={activeSpeakerId === spotlightUser?.data.peerID} onSpeakingStateChange={handleSpeakingStateChange} className="w-full h-full object-contain" />
                                         )}
@@ -840,7 +861,7 @@ const Room = () => {
                         <div className={`w-full h-full grid ${gridCols} ${gridRows} gap-4 pb-4`}>
                             {/* Local Video */}
                             <div className="bg-black rounded-xl overflow-hidden relative shadow-md border border-slate-200 dark:border-white/5 flex items-center justify-center">
-                                <Video stream={localDisplayStream} isMuted={true} isCameraOff={!isVideoOn && !isScreenSharing} name="You" peerID="local" isActiveSpeaker={activeSpeakerId === 'local'} onSpeakingStateChange={handleSpeakingStateChange} className={`w-full h-full object-cover ${totalUsers === 1 ? 'max-w-4xl max-h-4xl' : ''} ${isScreenSharing ? '' : 'transform scale-x-[-1]'}`} />
+                                <Video stream={localDisplayStream} isMuted={true} isCameraOff={!isVideoOn && !isScreenSharing} name="You" peerID="local" isLocal={true} isActiveSpeaker={activeSpeakerId === 'local'} onSpeakingStateChange={handleSpeakingStateChange} className={`w-full h-full object-cover ${totalUsers === 1 ? 'max-w-4xl max-h-4xl' : ''} ${isScreenSharing ? '' : 'transform scale-x-[-1]'}`} />
                             </div>
                             
                             {/* Peer Videos */}

@@ -2,15 +2,21 @@ import React, { useEffect, useRef } from 'react';
 import { MicOff, User } from 'lucide-react';
 import useAudioActivity from '../hooks/useAudioActivity';
 
-const Video = ({ stream, className = '', isMuted, isCameraOff, name, onSpeakingStateChange, peerID, isActiveSpeaker }) => {
+const Video = ({ stream, className = '', isMuted, isCameraOff, name, onSpeakingStateChange, peerID, isActiveSpeaker, isLocal }) => {
     const ref = useRef();
     const isSpeaking = useAudioActivity(stream);
 
     useEffect(() => {
-        if (ref.current && stream) {
-            ref.current.srcObject = stream;
+        if (ref.current) {
+            if (stream) {
+                ref.current.srcObject = stream;
+                ref.current.onloadedmetadata = () => {
+                    ref.current.play().catch(e => console.warn("Autoplay blocked:", e));
+                };
+            }
+            ref.current.muted = Boolean(isLocal || peerID === 'local');
         }
-    }, [stream]);
+    }, [stream, isLocal, peerID]);
 
     useEffect(() => {
         if (onSpeakingStateChange) {
@@ -24,6 +30,7 @@ const Video = ({ stream, className = '', isMuted, isCameraOff, name, onSpeakingS
                 playsInline
                 autoPlay
                 ref={ref}
+                muted={isLocal || peerID === 'local'}
                 className={`w-full h-full object-cover transition-opacity duration-300 ${isCameraOff ? 'opacity-0' : 'opacity-100'}`}
             />
 
